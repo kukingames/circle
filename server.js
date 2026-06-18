@@ -1,5 +1,4 @@
 const express = require('express');
-const session = require('express-session');
 const path = require('path');
 const authRoutes = require('./routes/auth');
 const boardRoutes = require('./routes/board');
@@ -13,12 +12,37 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: 'vortex-strike-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
-}));
+
+function cookieSession(req, res, next) {
+  const cookieName = 'vs_session';
+  req.session = {};
+  if (req.headers.cookie) {
+    const match = req.headers.cookie.split(';').find(c => c.trim().startsWith(cookieName + '='));
+    if (match) {
+      req.session.userId = decodeURIComponent(match.split('=')[1]);
+    }
+  }
+
+  req.session.destroy = function() { req.session = {}; };
+
+  const origJson = res.json.bind(res);
+  res.json = function(data) {
+    if (req.session && req.session.userId) {
+      res.cookie(cookieName, req.session.userId, {
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: !!process.env.RENDER
+      });
+    } else {
+      res.clearCookie(cookieName);
+    }
+    return origJson(data);
+  };
+  next();
+}
+
+app.use(cookieSession);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
