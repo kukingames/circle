@@ -256,19 +256,15 @@
       }
     });
 
-    const waitForAuth = setInterval(() => {
-      if (currentUser !== null || document.querySelector('.user-menu-toggle') === null) {
-        clearInterval(waitForAuth);
-        loadProfile();
-        loadMyPosts();
-        loadMyReports();
+    authReady.then(() => {
+      if (!currentUser) {
+        window.location.href = '/login.html';
+        return;
       }
-    }, 100);
-
-    setTimeout(() => {
-      clearInterval(waitForAuth);
-      if (!currentUser) loadProfile();
-    }, 3000);
+      loadProfile();
+      loadMyPosts();
+      loadMyReports();
+    });
   </script>
 </body>
 </html>
