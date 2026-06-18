@@ -16,6 +16,11 @@ router.post('/', (req, res) => {
   if (!req.session.userId) {
     return res.status(401).json({ error: 'ログインが必要です' });
   }
+  const users = readJSON('users.json');
+  const user = users.find(u => u.id === req.session.userId);
+  if (!user || !['admin', 'writer'].includes(user.role)) {
+    return res.status(403).json({ error: '投稿する権限がありません' });
+  }
   const { title, content } = req.body;
   const posts = readJSON('board.json');
   const post = {

@@ -32,7 +32,7 @@ async function loadBoard() {
 
 function showBoardForm() {
   const area = document.getElementById('board-form-area');
-  if (currentUser) {
+  if (currentUser && ['admin', 'writer'].includes(currentUser.role)) {
     area.innerHTML = `
       <div class="card" style="margin-bottom:30px">
         <h3 style="margin-bottom:16px">新しい投稿</h3>
@@ -72,7 +72,9 @@ async function submitBoardPost(e) {
       document.getElementById('board-title').value = '';
       document.getElementById('board-content').value = '';
       loadBoard();
-    } else {
+  } else if (currentUser) {
+    area.innerHTML = '<div class="card" style="margin-bottom:30px"><p>投稿する権限がありません</p></div>';
+  } else {
       const data = await res.json();
       alertEl.innerHTML = `<div class="alert alert-error">${data.error}</div>`;
     }

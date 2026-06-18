@@ -55,7 +55,7 @@ router.post('/users', isAdmin, (req, res) => {
     email,
     password: hash,
     displayName: displayName || username,
-    role: ['admin', 'member'].includes(role) ? role : 'member',
+    role: ['admin', 'member', 'writer'].includes(role) ? role : 'member',
     createdAt: new Date().toISOString()
   };
 
@@ -66,7 +66,7 @@ router.post('/users', isAdmin, (req, res) => {
 
 router.put('/users/:id/role', isAdmin, (req, res) => {
   const { role } = req.body;
-  if (!['admin', 'member'].includes(role)) {
+  if (!['admin', 'member', 'writer'].includes(role)) {
     return res.status(400).json({ error: '無効な役割です' });
   }
   const users = readJSON('users.json');

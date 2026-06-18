@@ -30,7 +30,7 @@ async function loadReports() {
 
 function showReportForm() {
   const area = document.getElementById('report-form-area');
-  if (currentUser) {
+  if (currentUser && ['admin', 'writer'].includes(currentUser.role)) {
     area.innerHTML = `
       <div class="card" style="margin-bottom:30px">
         <h3 style="margin-bottom:16px">新しい活動報告</h3>
@@ -54,9 +54,9 @@ function showReportForm() {
     `;
     document.getElementById('report-date').valueAsDate = new Date();
     document.getElementById('report-form').addEventListener('submit', submitReport);
+  } else if (currentUser) {
+    area.innerHTML = '<div class="card" style="margin-bottom:30px"><p>投稿する権限がありません</p></div>';
   } else {
-    area.innerHTML = '<div class="card" style="margin-bottom:30px"><p>投稿するには <a href="/login.html">ログイン</a> が必要です</p></div>';
-  }
 }
 
 async function submitReport(e) {
