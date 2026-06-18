@@ -57,6 +57,8 @@ function showReportForm() {
   } else if (currentUser) {
     area.innerHTML = '<div class="card" style="margin-bottom:30px"><p>投稿する権限がありません</p></div>';
   } else {
+    area.innerHTML = '<div class="card" style="margin-bottom:30px"><p>投稿するには <a href="/login.html">ログイン</a> が必要です</p></div>';
+  }
 }
 
 async function submitReport(e) {
