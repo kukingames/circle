@@ -74,6 +74,35 @@
       </div>
 
       <div class="tab-content active" id="tab-users">
+        <div class="card" style="margin-bottom:20px">
+          <h3 style="margin-bottom:15px">ユーザーを追加</h3>
+          <form id="create-user-form">
+            <div class="form-group">
+              <label for="new-username">ユーザー名</label>
+              <input type="text" id="new-username" required>
+            </div>
+            <div class="form-group">
+              <label for="new-displayName">表示名</label>
+              <input type="text" id="new-displayName">
+            </div>
+            <div class="form-group">
+              <label for="new-email">メールアドレス</label>
+              <input type="email" id="new-email" required>
+            </div>
+            <div class="form-group">
+              <label for="new-password">パスワード</label>
+              <input type="password" id="new-password" minlength="6" required>
+            </div>
+            <div class="form-group">
+              <label for="new-role">役割</label>
+              <select id="new-role">
+                <option value="member">メンバー</option>
+                <option value="admin">管理者</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">作成する</button>
+          </form>
+        </div>
         <div id="users-table"></div>
       </div>
 
@@ -354,6 +383,34 @@
 
     loadStats();
     loadUsers();
+
+    document.getElementById('create-user-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('new-username').value;
+      const displayName = document.getElementById('new-displayName').value;
+      const email = document.getElementById('new-email').value;
+      const password = document.getElementById('new-password').value;
+      const role = document.getElementById('new-role').value;
+
+      try {
+        const res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, displayName, email, password, role })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAdminAlert('ユーザーを作成しました');
+          e.target.reset();
+          loadUsers();
+          loadStats();
+        } else {
+          showAdminAlert(data.error, 'error');
+        }
+      } catch (e) {
+        showAdminAlert('作成に失敗しました', 'error');
+      }
+    });
   </script>
 </body>
 </html>

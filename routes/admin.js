@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { readJSON, writeJSON } = require('../database');
+const bcrypt = require('bcryptjs');
+const { readJSON, writeJSON, generateId } = require('../database');
 
 function isAdmin(req, res, next) {
   if (!req.session.userId) {
@@ -31,6 +32,36 @@ router.get('/users', isAdmin, (req, res) => {
     createdAt: u.createdAt
   }));
   res.json(members);
+});
+
+router.post('/users', isAdmin, (req, res) => {
+  const { username, email, password, displayName, role } = req.body;
+  const users = readJSON('users.json');
+
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: 'ユーザー名、メールアドレス、パスワードは必須です' });
+  }
+  if (users.find(u => u.email === email)) {
+    return res.status(400).json({ error: 'このメールアドレスは既に使用されています' });
+  }
+  if (users.find(u => u.username === username)) {
+    return res.status(400).json({ error: 'このユーザー名は既に使用されています' });
+  }
+
+  const hash = bcrypt.hashSync(password, 10);
+  const user = {
+    id: generateId(),
+    username,
+    email,
+    password: hash,
+    displayName: displayName || username,
+    role: ['admin', 'member'].includes(role) ? role : 'member',
+    createdAt: new Date().toISOString()
+  };
+
+  users.push(user);
+  writeJSON('users.json', users);
+  res.json({ user: { id: user.id, username: user.username, displayName: user.displayName, email: user.email, role: user.role } });
 });
 
 router.put('/users/:id/role', isAdmin, (req, res) => {
