@@ -1,0 +1,15 @@
+{
+  "name": "vortex-strike-circle",
+  "version": "1.0.0",
+  "description": "VORTEX STRIKE 大学サークルサイト",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "bcryptjs": "^2.4.3"
+  }
+}

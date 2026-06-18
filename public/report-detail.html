@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活動報告詳細 - VORTEX STRIKE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header>
+    <nav class="nav">
+      <a href="/" class="nav-brand">
+        <div class="nav-brand-icon">VS</div>
+        VORTEX STRIKE
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/">ホーム</a>
+        <a href="/about.html">設立目的</a>
+        <a href="/members.html">メンバー</a>
+        <a href="/activities.html">活動内容・場所</a>
+        <a href="/reports.html">活動報告</a>
+        <a href="/join.html">新規さん向け</a>
+        <a href="/board.html">連絡掲示板</a>
+        <a href="/contact.html">お問い合わせ</a>
+      </div>
+      <div class="nav-right">
+        <div id="auth-nav"></div>
+        <button class="nav-hamburger" onclick="toggleNav()">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section">
+      <div id="report-detail"></div>
+      <div style="margin-top:30px">
+        <a href="/reports.html" class="btn btn-secondary">活動報告一覧に戻る</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="copyright">&copy; 2026 VORTEX STRIKE. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    function toggleNav() {
+      document.getElementById('nav-links').classList.toggle('show');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function loadReport() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (!id) {
+        document.getElementById('report-detail').innerHTML = '<div class="empty-state"><p>活動報告が指定されていません</p></div>';
+        return;
+      }
+      try {
+        const res = await fetch(`/api/reports/${id}`);
+        if (!res.ok) throw new Error('Not found');
+        const report = await res.json();
+        document.getElementById('report-detail').innerHTML = `
+          <div class="card">
+            <h2 class="card-title">${escapeHtml(report.title)}</h2>
+            <div class="card-meta">${new Date(report.createdAt).toLocaleDateString('ja-JP')} | ${escapeHtml(report.authorName)}</div>
+            <div class="card-content report-content">${escapeHtml(report.content)}</div>
+          </div>
+        `;
+        document.title = `${report.title} - VORTEX STRIKE`;
+      } catch (e) {
+        document.getElementById('report-detail').innerHTML = '<div class="empty-state"><p>活動報告が見つかりません</p></div>';
+      }
+    }
+    loadReport();
+  </script>
+</body>
+</html>

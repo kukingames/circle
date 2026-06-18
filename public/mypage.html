@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マイページ - VORTEX STRIKE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header>
+    <nav class="nav">
+      <a href="/" class="nav-brand">
+        <div class="nav-brand-icon">VS</div>
+        VORTEX STRIKE
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/">ホーム</a>
+        <a href="/about.html">設立目的</a>
+        <a href="/members.html">メンバー</a>
+        <a href="/activities.html">活動内容・場所</a>
+        <a href="/reports.html">活動報告</a>
+        <a href="/join.html">新規さん向け</a>
+        <a href="/board.html">連絡掲示板</a>
+        <a href="/contact.html">お問い合わせ</a>
+      </div>
+      <div class="nav-right">
+        <div id="auth-nav"></div>
+        <button class="nav-hamburger" onclick="toggleNav()">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>マイページ</h1>
+      <p>アカウント情報と自分の投稿</p>
+    </div>
+
+    <section class="section">
+      <div id="mypage-alert"></div>
+
+      <div class="profile-card" id="profile-card">
+        <div class="profile-avatar" id="profile-avatar">-</div>
+        <div class="profile-name" id="profile-name">-</div>
+        <div class="profile-email" id="profile-email">-</div>
+        <div class="profile-role" id="profile-role">-</div>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat-number" id="stat-my-posts">-</div>
+            <div class="profile-stat-label">掲示板投稿</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-number" id="stat-my-reports">-</div>
+            <div class="profile-stat-label">活動報告</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('profile')">プロフィール編集</button>
+        <button class="tab-btn" onclick="switchTab('posts')">自分の投稿</button>
+        <button class="tab-btn" onclick="switchTab('reports')">自分の活動報告</button>
+      </div>
+
+      <div class="tab-content active" id="tab-profile">
+        <div class="card">
+          <h3 style="margin-bottom:20px">プロフィール編集</h3>
+          <form id="profile-form">
+            <div class="form-group">
+              <label for="edit-displayName">表示名</label>
+              <input type="text" id="edit-displayName" name="displayName">
+            </div>
+            <div class="form-group">
+              <label for="edit-email">メールアドレス</label>
+              <input type="email" id="edit-email" name="email">
+            </div>
+            <h4 style="margin:20px 0 10px;color:var(--text-light)">パスワード変更（任意）</h4>
+            <div class="form-group">
+              <label for="edit-currentPassword">現在のパスワード</label>
+              <input type="password" id="edit-currentPassword" name="currentPassword">
+            </div>
+            <div class="form-group">
+              <label for="edit-newPassword">新しいパスワード</label>
+              <input type="password" id="edit-newPassword" name="newPassword" minlength="6">
+            </div>
+            <button type="submit" class="btn btn-primary">保存する</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-posts">
+        <div id="my-posts-list"></div>
+      </div>
+
+      <div class="tab-content" id="tab-reports">
+        <div id="my-reports-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="copyright">&copy; 2026 VORTEX STRIKE. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    function toggleNav() {
+      document.getElementById('nav-links').classList.toggle('show');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showMyPageAlert(message, type = 'success') {
+      const alertEl = document.getElementById('mypage-alert');
+      alertEl.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      setTimeout(() => alertEl.innerHTML = '', 3000);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    function loadProfile() {
+      if (!currentUser) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      document.getElementById('profile-avatar').textContent = currentUser.displayName.charAt(0);
+      document.getElementById('profile-name').textContent = currentUser.displayName;
+      document.getElementById('profile-email').textContent = currentUser.email;
+      document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? '管理者' : 'メンバー';
+      document.getElementById('edit-displayName').value = currentUser.displayName;
+      document.getElementById('edit-email').value = currentUser.email || '';
+    }
+
+    async function loadMyPosts() {
+      try {
+        const res = await fetch('/api/board');
+        const posts = await res.json();
+        const myPosts = posts.filter(p => p.authorId === currentUser.id);
+        const container = document.getElementById('my-posts-list');
+        document.getElementById('stat-my-posts').textContent = myPosts.length;
+
+        if (myPosts.length === 0) {
+          container.innerHTML = '<div class="empty-state"><p>まだ投稿がありません</p></div>';
+          return;
+        }
+
+        container.innerHTML = myPosts.map(p => `
+          <div class="card board-item">
+            <h3 class="card-title">${escapeHtml(p.title)}</h3>
+            <div class="card-meta">${new Date(p.createdAt).toLocaleDateString('ja-JP')}</div>
+            <div class="card-content">${escapeHtml(p.content)}</div>
+            <div class="board-actions">
+              <button class="btn btn-danger btn-sm" onclick="deleteMyPost('${p.id}')">削除</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('my-posts-list').innerHTML = '<div class="empty-state"><p>読み込みエラー</p></div>';
+      }
+    }
+
+    async function loadMyReports() {
+      try {
+        const res = await fetch('/api/reports');
+        const reports = await res.json();
+        const myReports = reports.filter(r => r.authorId === currentUser.id);
+        const container = document.getElementById('my-reports-list');
+        document.getElementById('stat-my-reports').textContent = myReports.length;
+
+        if (myReports.length === 0) {
+          container.innerHTML = '<div class="empty-state"><p>まだ活動報告がありません</p></div>';
+          return;
+        }
+
+        container.innerHTML = myReports.map(r => `
+          <div class="card">
+            <h3 class="card-title">${escapeHtml(r.title)}</h3>
+            <div class="card-meta">${new Date(r.createdAt).toLocaleDateString('ja-JP')}</div>
+            <div class="card-content">${escapeHtml(r.content).substring(0, 200)}${r.content.length > 200 ? '...' : ''}</div>
+            <div class="board-actions">
+              <a href="/report-detail.html?id=${r.id}" class="btn btn-secondary btn-sm">詳細を見る</a>
+              <button class="btn btn-danger btn-sm" onclick="deleteMyReport('${r.id}')">削除</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('my-reports-list').innerHTML = '<div class="empty-state"><p>読み込みエラー</p></div>';
+      }
+    }
+
+    async function deleteMyPost(postId) {
+      if (!confirm('この投稿を削除しますか？')) return;
+      try {
+        const res = await fetch(`/api/board/${postId}`, { method: 'DELETE' });
+        if (res.ok) {
+          showMyPageAlert('投稿を削除しました');
+          loadMyPosts();
+        }
+      } catch (e) {
+        showMyPageAlert('削除に失敗しました', 'error');
+      }
+    }
+
+    async function deleteMyReport(reportId) {
+      if (!confirm('この活動報告を削除しますか？')) return;
+      try {
+        const res = await fetch(`/api/reports/${reportId}`, { method: 'DELETE' });
+        if (res.ok) {
+          showMyPageAlert('活動報告を削除しました');
+          loadMyReports();
+        }
+      } catch (e) {
+        showMyPageAlert('削除に失敗しました', 'error');
+      }
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const displayName = document.getElementById('edit-displayName').value;
+      const email = document.getElementById('edit-email').value;
+      const currentPassword = document.getElementById('edit-currentPassword').value;
+      const newPassword = document.getElementById('edit-newPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ displayName, email, currentPassword, newPassword })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showMyPageAlert('プロフィールを更新しました');
+          currentUser = { ...currentUser, displayName, email };
+          loadProfile();
+          document.getElementById('edit-currentPassword').value = '';
+          document.getElementById('edit-newPassword').value = '';
+        } else {
+          showMyPageAlert(data.error, 'error');
+        }
+      } catch (e) {
+        showMyPageAlert('更新に失敗しました', 'error');
+      }
+    });
+
+    const waitForAuth = setInterval(() => {
+      if (currentUser !== null || document.querySelector('.user-menu-toggle') === null) {
+        clearInterval(waitForAuth);
+        loadProfile();
+        loadMyPosts();
+        loadMyReports();
+      }
+    }, 100);
+
+    setTimeout(() => {
+      clearInterval(waitForAuth);
+      if (!currentUser) loadProfile();
+    }, 3000);
+  </script>
+</body>
+</html>

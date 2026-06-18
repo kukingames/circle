@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新規さん向け - VORTEX STRIKE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header>
+    <nav class="nav">
+      <a href="/" class="nav-brand">
+        <div class="nav-brand-icon">VS</div>
+        VORTEX STRIKE
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/">ホーム</a>
+        <a href="/about.html">設立目的</a>
+        <a href="/members.html">メンバー</a>
+        <a href="/activities.html">活動内容・場所</a>
+        <a href="/reports.html">活動報告</a>
+        <a href="/join.html">新規さん向け</a>
+        <a href="/board.html">連絡掲示板</a>
+        <a href="/contact.html">お問い合わせ</a>
+      </div>
+      <div class="nav-right">
+        <div id="auth-nav"></div>
+        <button class="nav-hamburger" onclick="toggleNav()">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>新規さん向け</h1>
+      <p>VORTEX STRIKEへの参加方法</p>
+    </div>
+
+    <section class="section">
+      <div class="info-box">
+        <h3>1. アカウントを作成</h3>
+        <p>まず、サイトのアカウントを作成してください。登録は無料です。</p>
+        <a href="/register.html" class="btn btn-primary" style="margin-top:12px">新規登録はこちら</a>
+      </div>
+
+      <div class="info-box">
+        <h3>2. 活動を確認</h3>
+        <p>「活動内容・場所」ページで、現在行っている活動を確認してください。興味のある活動があれば、お気軽にご参加ください。</p>
+        <a href="/activities.html" class="btn btn-secondary" style="margin-top:12px">活動内容を見る</a>
+      </div>
+
+      <div class="info-box">
+        <h3>3. 初めての参加</h3>
+        <p>初めて参加される方は、事前に「お問い合わせ」ページから連絡をください。当日の持ち物や注意事項をご案内します。</p>
+        <a href="/contact.html" class="btn btn-secondary" style="margin-top:12px">お問い合わせ</a>
+      </div>
+
+      <div class="info-box">
+        <h3>よくある質問</h3>
+        <p><strong>Q: 運動が苦手でも参加できますか？</strong></p>
+        <p>A: もちろんです！初心者向けの活動もあり、ペースに合わせて参加できます。</p>
+        <br>
+        <p><strong>Q: 会費はかかりますか？</strong></p>
+        <p>A: 会費は無料です。一部の活動で道具の貸し出し料がかかる場合があります。</p>
+        <br>
+        <p><strong>Q: 他のサークルと両立できますか？</strong></p>
+        <p>A: はい。活動は任意なので、お好きな時間に参加できます。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="copyright">&copy; 2026 VORTEX STRIKE. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    function toggleNav() {
+      document.getElementById('nav-links').classList.toggle('show');
+    }
+  </script>
+</body>
+</html>

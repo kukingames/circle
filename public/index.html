@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VORTEX STRIKE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body id="top">
+
+  <header>
+    <nav class="nav">
+      <a href="/" class="nav-brand">
+        <div class="nav-brand-icon">VS</div>
+        VORTEX STRIKE
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/">ホーム</a>
+        <a href="/about.html">設立目的</a>
+        <a href="/members.html">メンバー</a>
+        <a href="/activities.html">活動内容・場所</a>
+        <a href="/reports.html">活動報告</a>
+        <a href="/join.html">新規さん向け</a>
+        <a href="/board.html">連絡掲示板</a>
+        <a href="/contact.html">お問い合わせ</a>
+      </div>
+      <div class="nav-right">
+        <div id="auth-nav"></div>
+        <button class="nav-hamburger" onclick="toggleNav()">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <div class="main-visual">
+        <h1 class="main-visual-title">ようこそ！<br>VORTEX STRIKEへ</h1>
+        <h2 class="main-visual-subtitle">学科を超える、新しいつながり。運動から始まるコミュニケーション。<br>放課後に、もうひとつの居場所を。好きな時に、好きなスポーツを。</h2>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">最新の活動報告</h2>
+      <div id="latest-reports"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="copyright">&copy; 2026 VORTEX STRIKE. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    function toggleNav() {
+      document.getElementById('nav-links').classList.toggle('show');
+    }
+
+    async function loadLatestReports() {
+      try {
+        const res = await fetch('/api/reports');
+        const reports = await res.json();
+        const container = document.getElementById('latest-reports');
+        if (reports.length === 0) {
+          container.innerHTML = '<div class="empty-state"><p>まだ活動報告がありません</p></div>';
+          return;
+        }
+        container.innerHTML = reports.slice(0, 3).map(r => `
+          <div class="card">
+            <h3 class="card-title">${escapeHtml(r.title)}</h3>
+            <div class="card-meta">${new Date(r.createdAt).toLocaleDateString('ja-JP')} | ${escapeHtml(r.authorName)}</div>
+            <div class="card-content">${escapeHtml(r.content).substring(0, 150)}...</div>
+            <a href="/report-detail.html?id=${r.id}" class="btn btn-secondary" style="margin-top:12px">続きを読む</a>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('latest-reports').innerHTML = '<div class="empty-state"><p>読み込みエラー</p></div>';
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    loadLatestReports();
+  </script>
+</body>
+</html>

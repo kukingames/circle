@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活動内容・場所 - VORTEX STRIKE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header>
+    <nav class="nav">
+      <a href="/" class="nav-brand">
+        <div class="nav-brand-icon">VS</div>
+        VORTEX STRIKE
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/">ホーム</a>
+        <a href="/about.html">設立目的</a>
+        <a href="/members.html">メンバー</a>
+        <a href="/activities.html">活動内容・場所</a>
+        <a href="/reports.html">活動報告</a>
+        <a href="/join.html">新規さん向け</a>
+        <a href="/board.html">連絡掲示板</a>
+        <a href="/contact.html">お問い合わせ</a>
+      </div>
+      <div class="nav-right">
+        <div id="auth-nav"></div>
+        <button class="nav-hamburger" onclick="toggleNav()">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>活動内容・場所</h1>
+      <p>VORTEX STRIKEで行っている活動</p>
+    </div>
+
+    <section class="section">
+      <div class="info-box">
+        <h3>バスケットボール</h3>
+        <p>毎週火曜日 18:00〜20:00 | 体育館2階コート</p>
+        <p>初心者歓迎！基本練習から試合形式まで、レベルに合わせて参加できます。</p>
+      </div>
+
+      <div class="info-box">
+        <h3>フットサル</h3>
+        <p>毎週木曜日 18:00〜20:00 | 屋外フットサルコート</p>
+        <p>男女問わず楽しめるフットサル。チームで楽しくプレーしましょう。</p>
+      </div>
+
+      <div class="info-box">
+        <h3>テニス</h3>
+        <p>毎週水曜日 17:00〜19:00 | テニスコート</p>
+        <p>シングルス・ダブルスどちらも対応。ラケットの貸し出しがあります。</p>
+      </div>
+
+      <div class="info-box">
+        <h3>ランニング</h3>
+        <p>毎週金曜日 17:30〜19:00 | 校内周回コース</p>
+        <p>体力に合わせてペース調整。健康維持に最適です。</p>
+      </div>
+
+      <div class="info-box">
+        <h3>ハイキング</h3>
+        <p>月1回（土曜日）| 近隣の山・公園</p>
+        <p>月1回の自然散策イベント。季節の景色を楽しみながら歩きます。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="copyright">&copy; 2026 VORTEX STRIKE. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    function toggleNav() {
+      document.getElementById('nav-links').classList.toggle('show');
+    }
+  </script>
+</body>
+</html>

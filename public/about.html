@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>設立目的 - VORTEX STRIKE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header>
+    <nav class="nav">
+      <a href="/" class="nav-brand">
+        <div class="nav-brand-icon">VS</div>
+        VORTEX STRIKE
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/">ホーム</a>
+        <a href="/about.html">設立目的</a>
+        <a href="/members.html">メンバー</a>
+        <a href="/activities.html">活動内容・場所</a>
+        <a href="/reports.html">活動報告</a>
+        <a href="/join.html">新規さん向け</a>
+        <a href="/board.html">連絡掲示板</a>
+        <a href="/contact.html">お問い合わせ</a>
+      </div>
+      <div class="nav-right">
+        <div id="auth-nav"></div>
+        <button class="nav-hamburger" onclick="toggleNav()">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>設立目的</h1>
+      <p>VORTEX STRIKEが目指すもの</p>
+    </div>
+
+    <section class="section">
+      <div class="info-box">
+        <h3>運動でつながる新しいコミュニティ</h3>
+        <p>VORTEX STRIKEは、学科や学部の枠を超えて、運動を通じた新しい人とのつながりを大切にしています。お互いが自分の学科や専攻を持ちながらも、共通の兴趣を通じて交流できる場を提供します。</p>
+      </div>
+
+      <div class="info-box">
+        <h3>放課後の居場所づくり</h3>
+        <p>大学生活において、教室や研究室以外の居場所は貴重です。VORTEX STRIKEは、放課後にリラックスして运动を楽しめる、第二の居場所を提供します。</p>
+      </div>
+
+      <div class="info-box">
+        <h3>好きな時に、好きなスポーツを</h3>
+        <p>週何回も活動がある、这样的な義務感はありません。気分に合わせて、興味のあるスポーツに自由に参加できるのがVORTEX STRIKEの魅力です。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="copyright">&copy; 2026 VORTEX STRIKE. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    function toggleNav() {
+      document.getElementById('nav-links').classList.toggle('show');
+    }
+  </script>
+</body>
+</html>

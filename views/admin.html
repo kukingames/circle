@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理者ページ - VORTEX STRIKE</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header>
+    <nav class="nav">
+      <a href="/" class="nav-brand">
+        <div class="nav-brand-icon">VS</div>
+        VORTEX STRIKE
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/">ホーム</a>
+        <a href="/about.html">設立目的</a>
+        <a href="/members.html">メンバー</a>
+        <a href="/activities.html">活動内容・場所</a>
+        <a href="/reports.html">活動報告</a>
+        <a href="/join.html">新規さん向け</a>
+        <a href="/board.html">連絡掲示板</a>
+        <a href="/contact.html">お問い合わせ</a>
+      </div>
+      <div class="nav-right">
+        <div id="auth-nav"></div>
+        <button class="nav-hamburger" onclick="toggleNav()">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>管理者ページ</h1>
+      <p>サイトの管理とユーザー管理</p>
+    </div>
+
+    <section class="section">
+      <div id="admin-alert"></div>
+
+      <div class="dashboard-grid" id="stats-grid">
+        <div class="dashboard-card">
+          <div class="dashboard-card-icon purple">👥</div>
+          <div class="dashboard-card-number" id="stat-users">-</div>
+          <div class="dashboard-card-label">ユーザー数</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-card-icon blue">📝</div>
+          <div class="dashboard-card-number" id="stat-posts">-</div>
+          <div class="dashboard-card-label">掲示板投稿</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-card-icon green">📋</div>
+          <div class="dashboard-card-number" id="stat-reports">-</div>
+          <div class="dashboard-card-label">活動報告</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-card-icon orange">✉️</div>
+          <div class="dashboard-card-number" id="stat-contacts">-</div>
+          <div class="dashboard-card-label">お問い合わせ</div>
+        </div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('users')">ユーザー管理</button>
+        <button class="tab-btn" onclick="switchTab('contacts')">お問い合わせ管理</button>
+        <button class="tab-btn" onclick="switchTab('board')">掲示板管理</button>
+        <button class="tab-btn" onclick="switchTab('reports')">活動報告管理</button>
+      </div>
+
+      <div class="tab-content active" id="tab-users">
+        <div id="users-table"></div>
+      </div>
+
+      <div class="tab-content" id="tab-contacts">
+        <div id="contacts-list"></div>
+      </div>
+
+      <div class="tab-content" id="tab-board">
+        <div id="board-list-admin"></div>
+      </div>
+
+      <div class="tab-content" id="tab-reports">
+        <div id="reports-list-admin"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="copyright">&copy; 2026 VORTEX STRIKE. All rights reserved.</p>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    function toggleNav() {
+      document.getElementById('nav-links').classList.toggle('show');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showAdminAlert(message, type = 'success') {
+      const alertEl = document.getElementById('admin-alert');
+      alertEl.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      setTimeout(() => alertEl.innerHTML = '', 3000);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+
+      if (tabName === 'users') loadUsers();
+      if (tabName === 'contacts') loadContacts();
+      if (tabName === 'board') loadBoardAdmin();
+      if (tabName === 'reports') loadReportsAdmin();
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/admin/stats');
+        if (!res.ok) throw new Error('Unauthorized');
+        const stats = await res.json();
+        document.getElementById('stat-users').textContent = stats.totalUsers;
+        document.getElementById('stat-posts').textContent = stats.totalPosts;
+        document.getElementById('stat-reports').textContent = stats.totalReports;
+        document.getElementById('stat-contacts').textContent = stats.totalContacts;
+      } catch (e) {
+        showAdminAlert('管理者権限がありません', 'error');
+        setTimeout(() => window.location.href = '/', 2000);
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const res = await fetch('/api/admin/users');
+        const users = await res.json();
+        const container = document.getElementById('users-table');
+
+        if (users.length === 0) {
+          container.innerHTML = '<div class="empty-state"><p>ユーザーがいません</p></div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>表示名</th>
+                <th>ユーザー名</th>
+                <th>メール</th>
+                <th>役割</th>
+                <th>登録日</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${users.map(u => `
+                <tr>
+                  <td>${escapeHtml(u.displayName)}</td>
+                  <td>${escapeHtml(u.username)}</td>
+                  <td>${escapeHtml(u.email)}</td>
+                  <td>
+                    <select onchange="changeRole('${u.id}', this.value)" style="padding:4px 8px;border-radius:4px;border:1px solid var(--border)">
+                      <option value="member" ${u.role === 'member' ? 'selected' : ''}>メンバー</option>
+                      <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>管理者</option>
+                    </select>
+                  </td>
+                  <td>${new Date(u.createdAt).toLocaleDateString('ja-JP')}</td>
+                  <td>
+                    <div class="admin-actions">
+                      <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">削除</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (e) {
+        document.getElementById('users-table').innerHTML = '<div class="empty-state"><p>読み込みエラー</p></div>';
+      }
+    }
+
+    async function changeRole(userId, role) {
+      try {
+        const res = await fetch(`/api/admin/users/${userId}/role`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role })
+        });
+        if (res.ok) {
+          showAdminAlert('役割を更新しました');
+        } else {
+          const data = await res.json();
+          showAdminAlert(data.error, 'error');
+        }
+      } catch (e) {
+        showAdminAlert('更新に失敗しました', 'error');
+      }
+    }
+
+    async function deleteUser(userId) {
+      if (!confirm('このユーザーを削除しますか？')) return;
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+        if (res.ok) {
+          showAdminAlert('ユーザーを削除しました');
+          loadUsers();
+          loadStats();
+        } else {
+          const data = await res.json();
+          showAdminAlert(data.error, 'error');
+        }
+      } catch (e) {
+        showAdminAlert('削除に失敗しました', 'error');
+      }
+    }
+
+    async function loadContacts() {
+      try {
+        const res = await fetch('/api/admin/contacts');
+        const contacts = await res.json();
+        const container = document.getElementById('contacts-list');
+
+        if (contacts.length === 0) {
+          container.innerHTML = '<div class="empty-state"><p>お問い合わせはありません</p></div>';
+          return;
+        }
+
+        container.innerHTML = contacts.map(c => `
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:start">
+              <div>
+                <h3 class="card-title">${escapeHtml(c.subject || '（件名なし）')}</h3>
+                <div class="card-meta">${escapeHtml(c.name)} | ${escapeHtml(c.email)} | ${new Date(c.createdAt).toLocaleDateString('ja-JP')}</div>
+                <div class="card-content">${escapeHtml(c.message)}</div>
+              </div>
+              <button class="btn btn-danger btn-sm" onclick="deleteContact('${c.id}')">削除</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('contacts-list').innerHTML = '<div class="empty-state"><p>読み込みエラー</p></div>';
+      }
+    }
+
+    async function deleteContact(contactId) {
+      if (!confirm('このお問い合わせを削除しますか？')) return;
+      try {
+        const res = await fetch(`/api/admin/contacts/${contactId}`, { method: 'DELETE' });
+        if (res.ok) {
+          showAdminAlert('お問い合わせを削除しました');
+          loadContacts();
+          loadStats();
+        }
+      } catch (e) {
+        showAdminAlert('削除に失敗しました', 'error');
+      }
+    }
+
+    async function loadBoardAdmin() {
+      try {
+        const res = await fetch('/api/board');
+        const posts = await res.json();
+        const container = document.getElementById('board-list-admin');
+
+        if (posts.length === 0) {
+          container.innerHTML = '<div class="empty-state"><p>投稿はありません</p></div>';
+          return;
+        }
+
+        container.innerHTML = posts.map(p => `
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:start">
+              <div>
+                <h3 class="card-title">${escapeHtml(p.title)}</h3>
+                <div class="card-meta">${escapeHtml(p.authorName)} | ${new Date(p.createdAt).toLocaleDateString('ja-JP')}</div>
+                <div class="card-content">${escapeHtml(p.content).substring(0, 200)}${p.content.length > 200 ? '...' : ''}</div>
+              </div>
+              <button class="btn btn-danger btn-sm" onclick="deleteBoardPost('${p.id}')">削除</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('board-list-admin').innerHTML = '<div class="empty-state"><p>読み込みエラー</p></div>';
+      }
+    }
+
+    async function deleteBoardPost(postId) {
+      if (!confirm('この投稿を削除しますか？')) return;
+      try {
+        const res = await fetch(`/api/board/${postId}`, { method: 'DELETE' });
+        if (res.ok) {
+          showAdminAlert('投稿を削除しました');
+          loadBoardAdmin();
+          loadStats();
+        }
+      } catch (e) {
+        showAdminAlert('削除に失敗しました', 'error');
+      }
+    }
+
+    async function loadReportsAdmin() {
+      try {
+        const res = await fetch('/api/reports');
+        const reports = await res.json();
+        const container = document.getElementById('reports-list-admin');
+
+        if (reports.length === 0) {
+          container.innerHTML = '<div class="empty-state"><p>活動報告はありません</p></div>';
+          return;
+        }
+
+        container.innerHTML = reports.map(r => `
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:start">
+              <div>
+                <h3 class="card-title">${escapeHtml(r.title)}</h3>
+                <div class="card-meta">${escapeHtml(r.authorName)} | ${new Date(r.createdAt).toLocaleDateString('ja-JP')}</div>
+                <div class="card-content">${escapeHtml(r.content).substring(0, 200)}${r.content.length > 200 ? '...' : ''}</div>
+              </div>
+              <button class="btn btn-danger btn-sm" onclick="deleteReport('${r.id}')">削除</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('reports-list-admin').innerHTML = '<div class="empty-state"><p>読み込みエラー</p></div>';
+      }
+    }
+
+    async function deleteReport(reportId) {
+      if (!confirm('この活動報告を削除しますか？')) return;
+      try {
+        const res = await fetch(`/api/reports/${reportId}`, { method: 'DELETE' });
+        if (res.ok) {
+          showAdminAlert('活動報告を削除しました');
+          loadReportsAdmin();
+          loadStats();
+        }
+      } catch (e) {
+        showAdminAlert('削除に失敗しました', 'error');
+      }
+    }
+
+    loadStats();
+    loadUsers();
+  </script>
+</body>
+</html>
