@@ -140,7 +140,7 @@
       document.getElementById('profile-avatar').textContent = currentUser.displayName.charAt(0);
       document.getElementById('profile-name').textContent = currentUser.displayName;
       document.getElementById('profile-email').textContent = currentUser.email;
-      document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? '管理者' : 'メンバー';
+      document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? '管理者' : currentUser.role === 'writer' ? 'メンバー（書き込み可）' : 'メンバー';
       document.getElementById('edit-displayName').value = currentUser.displayName;
       document.getElementById('edit-email').value = currentUser.email || '';
     }

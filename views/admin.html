@@ -97,7 +97,7 @@
               <label for="new-role">役割</label>
               <select id="new-role">
                 <option value="member">メンバー</option>
-                <option value="writer">投稿者</option>
+                <option value="writer">メンバー（書き込み可）</option>
                 <option value="admin">管理者</option>
               </select>
             </div>
@@ -202,7 +202,7 @@
                   <td>
                     <select onchange="changeRole('${u.id}', this.value)" style="padding:4px 8px;border-radius:4px;border:1px solid var(--border)">
                       <option value="member" ${u.role === 'member' ? 'selected' : ''}>メンバー</option>
-                      <option value="writer" ${u.role === 'writer' ? 'selected' : ''}>投稿者</option>
+                      <option value="writer" ${u.role === 'writer' ? 'selected' : ''}>メンバー（書き込み可）</option>
                       <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>管理者</option>
                     </select>
                   </td>
