@@ -40,7 +40,7 @@ router.post('/register', (req, res) => {
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
   const users = readJSON('users.json');
-  const user = users.find(u => u.email === email);
+  const user = users.find(u => u.email === email || u.username === email);
 
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return res.status(401).json({ error: 'メールアドレスまたはパスワードが正しくありません' });
