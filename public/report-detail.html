@@ -73,7 +73,7 @@
         document.getElementById('report-detail').innerHTML = `
           <div class="card">
             <h2 class="card-title">${escapeHtml(report.title)}</h2>
-            <div class="card-meta">${new Date(report.createdAt).toLocaleDateString('ja-JP')} | ${escapeHtml(report.authorName)}</div>
+            <div class="card-meta">${new Date(report.activityDate || report.createdAt).toLocaleDateString('ja-JP')} | ${escapeHtml(report.authorName)}</div>
             <div class="card-content report-content">${escapeHtml(report.content)}</div>
           </div>
         `;

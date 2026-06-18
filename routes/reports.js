@@ -25,13 +25,14 @@ router.post('/', (req, res) => {
   if (!req.session.userId) {
     return res.status(401).json({ error: 'ログインが必要です' });
   }
-  const { title, content, imageUrl } = req.body;
+  const { title, content, imageUrl, activityDate } = req.body;
   const reports = readJSON('reports.json');
   const report = {
     id: generateId(),
     title,
     content,
     imageUrl: imageUrl || '',
+    activityDate: activityDate || new Date().toISOString().split('T')[0],
     authorId: req.session.userId,
     createdAt: new Date().toISOString()
   };

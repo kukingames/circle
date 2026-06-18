@@ -18,7 +18,7 @@ async function loadReports() {
     container.innerHTML = reports.map(r => `
       <div class="card">
         <h3 class="card-title">${escapeHtml(r.title)}</h3>
-        <div class="card-meta">${new Date(r.createdAt).toLocaleDateString('ja-JP')} | ${escapeHtml(r.authorName)}</div>
+        <div class="card-meta">${new Date(r.activityDate || r.createdAt).toLocaleDateString('ja-JP')} | ${escapeHtml(r.authorName)}</div>
         <div class="card-content">${escapeHtml(r.content).substring(0, 200)}...</div>
         <a href="/report-detail.html?id=${r.id}" class="btn btn-secondary" style="margin-top:12px">続きを読む</a>
       </div>
@@ -37,6 +37,10 @@ function showReportForm() {
         <div id="report-alert"></div>
         <form id="report-form">
           <div class="form-group">
+            <label for="report-date">活動日</label>
+            <input type="date" id="report-date" required>
+          </div>
+          <div class="form-group">
             <label for="report-title">タイトル</label>
             <input type="text" id="report-title" required>
           </div>
@@ -48,6 +52,7 @@ function showReportForm() {
         </form>
       </div>
     `;
+    document.getElementById('report-date').valueAsDate = new Date();
     document.getElementById('report-form').addEventListener('submit', submitReport);
   } else {
     area.innerHTML = '<div class="card" style="margin-bottom:30px"><p>投稿するには <a href="/login.html">ログイン</a> が必要です</p></div>';
@@ -56,6 +61,7 @@ function showReportForm() {
 
 async function submitReport(e) {
   e.preventDefault();
+  const date = document.getElementById('report-date').value;
   const title = document.getElementById('report-title').value;
   const content = document.getElementById('report-content').value;
   const alertEl = document.getElementById('report-alert');
@@ -64,9 +70,10 @@ async function submitReport(e) {
     const res = await fetch('/api/reports', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content })
+      body: JSON.stringify({ title, content, activityDate: date })
     });
     if (res.ok) {
+      document.getElementById('report-date').valueAsDate = new Date();
       document.getElementById('report-title').value = '';
       document.getElementById('report-content').value = '';
       loadReports();
