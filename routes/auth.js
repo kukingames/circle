@@ -29,6 +29,11 @@ router.post('/register', (req, res) => {
   writeJSON('users.json', users);
 
   req.session.userId = user.id;
+  res.cookie('vs_session', user.id, {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'lax'
+  });
   res.json({ user: { id: user.id, username: user.username, displayName: user.displayName, role: user.role } });
 });
 
@@ -42,11 +47,17 @@ router.post('/login', (req, res) => {
   }
 
   req.session.userId = user.id;
+  res.cookie('vs_session', user.id, {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'lax'
+  });
   res.json({ user: { id: user.id, username: user.username, displayName: user.displayName, role: user.role } });
 });
 
 router.post('/logout', (req, res) => {
   req.session.destroy();
+  res.clearCookie('vs_session');
   res.json({ message: 'ログアウトしました' });
 });
 

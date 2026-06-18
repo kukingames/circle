@@ -10,6 +10,8 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,23 +24,7 @@ function cookieSession(req, res, next) {
       req.session.userId = decodeURIComponent(match.split('=')[1]);
     }
   }
-
   req.session.destroy = function() { req.session = {}; };
-
-  const origJson = res.json.bind(res);
-  res.json = function(data) {
-    if (req.session && req.session.userId) {
-      res.cookie(cookieName, req.session.userId, {
-        maxAge: 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: !!process.env.RENDER
-      });
-    } else {
-      res.clearCookie(cookieName);
-    }
-    return origJson(data);
-  };
   next();
 }
 
